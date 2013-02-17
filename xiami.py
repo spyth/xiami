@@ -84,8 +84,10 @@ def main():
 	else :
 		help_info()
 		return
-	
-	r = requests.get(url)
+	#r = requests.get(url)
+	session = requests.Session()
+	session.headers.update({'User-Agent':UA})
+	r = session.get(url)
 	if r.status_code == 200:
 		res = extract(r.content)
 		if not os.path.exists(TARGET):
@@ -103,7 +105,7 @@ def main():
 				download(lrc,title,'lrc','w')
 			cnt += 1
 	else:
-		print 'Oops.Request Failed...'
+		print 'Oops.Request Failed...%d'%r.status_code
 		print 'Check The URL: %s'%url
 	
 def help_info():
