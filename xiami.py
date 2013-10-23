@@ -12,7 +12,9 @@ _trackUrl = 'http://www.xiami.com/song/playlist/id/%s'
 _albumUrl = 'http://www.xiami.com/song/playlist/id/%s/type/1'
 _collectUrl = 'http://www.xiami.com/song/playlist/id/%s/type/3'
 
-TARGET = './xiami'
+TARGET = common.os.path.join(os.path.expanduser('~'), 'Music','xiami')
+if common.os.sys.platform.find('win') != -1:
+    TARGET = 'E:\\Music\\xiami'
 
 def parse_url(loc):
     '''Parse the uri of the mp3'''
@@ -21,8 +23,7 @@ def parse_url(loc):
     numz = int(math.ceil(length*1.0/line))
     numd = int(math.floor(length*1.0/line))
     mod = length%line
-
-    npl = [0] + [numz] * mod + [numd] * (line-mod-1)
+    npl = [0] + [numz]*mod + [numd]*(line-mod-1)
     uri = ""
     for i in range(1,numz+1):
         cnt = i
@@ -31,7 +32,7 @@ def parse_url(loc):
                 cnt += n
                 uri += loc[cnt]
         else:
-            if mod == 0: mod = line
+            if mod == 0: mod=line
             for j in range(0,mod):
                 cnt += npl[j]
                 uri += loc[cnt]
@@ -63,7 +64,6 @@ def main():
     if len(sys.argv) < 3 or (sys.argv[1] != '-t' and len(sys.argv) > 3):
         help_info()
         return
-
     if sys.argv[1] == '-a':
         url = _albumUrl % sys.argv[2]
     elif sys.argv[1] == '-c':
@@ -73,15 +73,14 @@ def main():
     else :
         help_info()
         return
-
     content = common.open_url(url)
     if not content:
         return
     res = extract(content)
     for title,uri,lrc in res:
         common.download(uri,TARGET,title,'mp3')
-        #if lrc:
-        #    download(lrc,TARGET,title,'lrc','w')
+        if lrc:
+            #download the lyric
 
 def help_info():
     print '.................USAGE....................'

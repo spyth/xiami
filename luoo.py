@@ -6,12 +6,14 @@ import xml.etree.ElementTree as ET
 
 import common
 
-xmlUrl_1 = 'http://www.luoo.net/radio/radio%d/mp3.xml'
-xmlUrl_2 = 'http://www.luoo.net/radio/radio%d/mp3player.xml'
+xml_url_1 = 'http://www.luoo.net/radio/radio%d/mp3.xml'
+xml_url_2 = 'http://www.luoo.net/radio/radio%d/mp3player.xml'
 
 referer = 'http://www.luoo.net/radio/radio%d/mp3player.html'
 
-TARGET = './luoo'
+TARGET = '/home/spyth/Music/luoo/%d'
+if common.os.sys.platform.find('win') != -1:
+    TARGET = 'E:\\Music\\luoo\\%d'
 
 def extract(html):
     if not html :
@@ -21,33 +23,34 @@ def extract(html):
     for song in root:
         title = song.get('title')
         location = song.get('path')
-        li.append((title,location))
+        li.append((title, location))
     return li
 
 def download_show(li):
     for num in li:
         if num > 296: 
-            url = xmlUrl_1 % num
+            url = xml_url_1%num
         else:
-            url = xmlUrl_2 % num 
+            url = xml_url_2%num 
         xml_data = common.open_url(url)
         if xml_data:
             songlist = extract(xml_data)
+            target_dir = TARGET%num
             for title, location in songlist:
                 ext = location.split('.')[-1]
-                common.download(location, TARGET, title, ext, Referer = referer % num)
+                common.download(location, target_dir, title, ext, Referer=referer%num)
 
 def main():
     if len(sys.argv) >= 2:
         try:
             li = map(int, sys.argv[1:])
         except:
-            print 'Inout Error!'
+            print 'Input Error!'
             return
         download_show(li)
     else:
-        print "输入期号下载,','分开.'q'退出"
-        while True:
+        print u"输入期号下载,','分开.'q'退出"
+        while 1:
             comm = raw_input('Select:')
             if comm == 'q':
                 return
